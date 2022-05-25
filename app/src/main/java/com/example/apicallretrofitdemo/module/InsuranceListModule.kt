@@ -5,6 +5,7 @@ import com.example.apicallretrofitdemo.api.InsuranceService
 import com.example.apicallretrofitdemo.utils.ViewModelKey
 import com.example.apicallretrofitdemo.view_models.InsuranceListViewModel
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,25 +29,22 @@ class InsuranceListModule {
     }
 
     @Provides
-    fun getRetrofit(okHttpClient: OkHttpClient, mosh: Moshi): Retrofit {
+    fun getRetrofit( okHttpClient: OkHttpClient, mosh: Moshi): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://reqres.in/")
+            .baseUrl("https://mobdevtest2.imscareportal.com:10443/imsgo/mservices/")
             .addConverterFactory(MoshiConverterFactory.create(mosh))
             .client(okHttpClient)
             .build()
     }
 
-    @Singleton
     @Provides
-    fun providesMoshi() = Moshi.Builder().build()
+    fun providesMoshi() = Moshi.Builder() .addLast(KotlinJsonAdapterFactory()).build()
 
     @Provides
     fun getOkHttpCleint(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
-        return httpLoggingInterceptor.let {
-            OkHttpClient.Builder()
-                .addInterceptor(it)
+        return OkHttpClient.Builder()
+                .addInterceptor(httpLoggingInterceptor)
                 .build()
-        }
     }
 
     @Provides

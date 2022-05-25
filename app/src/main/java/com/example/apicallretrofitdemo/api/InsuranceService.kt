@@ -1,14 +1,19 @@
 package com.example.apicallretrofitdemo.api
 
 
-import com.example.apicallretrofitdemo.datamodels.Example
+import com.example.apicallretrofitdemo.datamodels.DmInsuranceListRequest
+import com.example.apicallretrofitdemo.datamodels.DmInsuranceListResponse
+import com.example.apicallretrofitdemo.datamodels.ResponseObject
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
 
 interface InsuranceService {
 
-    @GET("api/users")
-    suspend fun getPatientInsurances(): Response<Example>
+    @POST("apps.php")
+    suspend fun getPatientInsurances(@Body dmInsuranceListRequest: DmInsuranceListRequest): ResponseObject<DmInsuranceListResponse>
 
 //    @Multipart
 //    @POST("api/insurance/uploadInsurance")
