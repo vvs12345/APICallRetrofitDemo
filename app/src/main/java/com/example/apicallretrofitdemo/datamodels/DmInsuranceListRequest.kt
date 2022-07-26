@@ -2,24 +2,26 @@ package com.example.apicallretrofitdemo.datamodels
 
 import android.os.Parcelable
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
+@JsonClass(generateAdapter = true)
 data class DmInsuranceListRequest(
     @field:Json(name = "patient_id")
-    var patient_id: String = "",
+    var patientId: String = "",
     @field:Json(name ="COMMAND")
-    var COMMAND: String? = null,
+    var command: String? = null,
 
-    @field:Json(name ="device_id") var device_id: String? = null,
+    @field:Json(name ="device_id") var deviceId: String? = null,
 
-    @field:Json(name ="machine_name") var machine_name: String? = null,
+    @field:Json(name ="machine_name") var machineName: String? = null,
 
     @field:Json(name ="token") var token: String? = null,
 
     @field:Json(name ="user_id")
-    var user_id: String? = null,
+    var userId: String? = null,
 
     @field:Json(name ="username")
-    var username: String? = null,
+    var userName: String? = null,
 ) : Parcelable

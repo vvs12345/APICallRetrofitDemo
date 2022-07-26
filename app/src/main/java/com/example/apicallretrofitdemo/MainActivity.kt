@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.apicallretrofitdemo.databinding.ActivityMainBinding
 import com.example.apicallretrofitdemo.datamodels.DmInsuranceListRequest
@@ -21,55 +22,31 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val viewModel: InsuranceListViewModel by viewModels ()
+    private val viewModel: InsuranceListViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-//
-        val dmInsuranceListRequest= DmInsuranceListRequest().apply {
-            patient_id="1"
-            COMMAND="GET_PATIENT_INSURANCE"
-            device_id="38ef00ede98a45d7"
-            machine_name="38ef00ede98a45d7"
-            token="1446c9ecefe63b6a219b4e9bb14a6dee"
-            user_id="129"
-            username="GBazo"
+        val dmInsuranceListRequest = DmInsuranceListRequest().apply {
+            patientId = "1"
+            command = "GET_PATIENT_INSURANCE"
+            deviceId = "38ef00ede98a45d7"
+            machineName = "38ef00ede98a45d7"
+            token = "1q2w3e4r5t6y"
+            userId = "129"
+            userName = "GBazo"
         }
         viewModel.getInsuranceList(dmInsuranceListRequest)
 
-        lifecycleScope.launch {
+        viewModel.response.observe(this) {
+            binding.progressBar.isVisible = false
+            Log.e("QQQQQQQQQQQQQQQQQ", "" + it.patientInsurances.toString())
+        }
 
-            viewModel.commentState.collect {
-
-                // When state to check the
-                // state of received data
-                when (it.status) {
-
-                    // If its loading state then
-                    // show the progress bar
-                    Status.LOADING -> {
-                        binding.progressBar.isVisible = true
-                    }
-                    // If api call was a success , Update the Ui with
-                    // data and make progress bar invisible
-                    Status.SUCCESS -> {
-                        binding.progressBar.isVisible = false
-
-                        // Received data can be null, put a check to prevent
-                        // null pointer exception
-                        it.data?.let { comment ->
-                            Log.e("QQQQQQQQQQQQQQQQQ",""+ comment.data.patientInsurances.toString())
-                        }
-                    }
-                    // In case of error, show some data to user
-                    else -> {
-                        binding.progressBar.isVisible = false
-                        Toast.makeText(this@MainActivity, "${it.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
+        viewModel.errorMessage.observe(this) {
+            binding.progressBar.isVisible = false
+            Log.e("QQQQQQQQQQQQQQQQQ", "" + it)
         }
     }
 }

@@ -1,16 +1,14 @@
 package com.example.apicallretrofitdemo.view_models
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.apicallretrofitdemo.datamodels.DmInsuranceListRequest
 import com.example.apicallretrofitdemo.datamodels.DmInsuranceListResponse
-import com.example.apicallretrofitdemo.datamodels.ResponseObject
 import com.example.apicallretrofitdemo.repository.InsuranceRepository
 import com.example.apicallretrofitdemo.utils.CommentApiState
-import com.example.apicallretrofitdemo.utils.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,20 +17,33 @@ import javax.inject.Inject
 class InsuranceListViewModel @Inject constructor(private val insuranceRepository: InsuranceRepository) :
     ViewModel() {
 
-    val commentState = MutableStateFlow(
-        CommentApiState(
-            Status.LOADING,
-            ResponseObject<DmInsuranceListResponse>(), ""
-        )
-    )
+
+
+    private val _response: MutableLiveData<DmInsuranceListResponse> = MutableLiveData()
+    val response: LiveData<DmInsuranceListResponse> = _response
+
+    private val _errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: LiveData<String> = _errorMessage
 
     fun getInsuranceList(dmInsuranceListRequest: DmInsuranceListRequest) {
         viewModelScope.launch {
-            insuranceRepository.getInsurances(dmInsuranceListRequest).catch {
-                commentState.value =
-                    CommentApiState.error(it.message.toString())
-            }.collect {
-                commentState.value = CommentApiState.success(it.data)
+            val networkResponseState = insuranceRepository.getInsurances(dmInsuranceListRequest)
+            networkResponseState
+                .collect {
+                when (it) {
+                    is CommentApiState.Success -> {
+                        _response.value=it.data
+                    }
+                    is CommentApiState.Error -> {
+                        _errorMessage.value = it.description
+                    }
+                    is CommentApiState.OtherSuccess -> {
+
+                    }
+                    is CommentApiState.TokenAuthFailed -> {
+                        _errorMessage.value = it.description
+                    }
+                }
             }
         }
     }
